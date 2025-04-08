@@ -22,7 +22,7 @@ import no.hvl.dat110.middleware.Node;
 import no.hvl.dat110.rpc.interfaces.NodeInterface;
 
 public class Util {
-	 
+
 	public static String activeIP = null;
 	public static int numReplicas = 4;  
 	
@@ -42,10 +42,21 @@ public class Util {
 		// The interval (6, 2) using the notation above means; pred = 6 and node = 2
 		// if id = 4, then (6 < 4 <= 2) = false  
 		// if id = 9, then (6 < 9 <= 2) = true
+		BigInteger mod = Hash.addressSize();
+		if(lower.compareTo(upper) < 0){
+			//lower < upper
+			return id.compareTo(lower) >= 0 && id.compareTo(upper) <= 0;
+
+		} else if(lower.compareTo(upper) > 0){
+			//lower > upper
+			// 7 8 9 10 0 1 2 3 // lower = 7, upper = 2
+			return (id.compareTo(lower) >= 0 && id.compareTo(mod.subtract(BigInteger.ONE)) <= 0)
+					|| (id.compareTo(BigInteger.ZERO) >= 0 && id.compareTo(upper) <= 0);
+		}else{
+			return true;
+		}
 		
 		// Task: given an identifier, id: check whether pred < id <= node
-		
-		return false;
 
 	}
 	
