@@ -53,33 +53,42 @@ public class MutualExclusion {
 		
 		logger.info(node.nodename + " wants to access CS");
 		// clear the queueack before requesting for votes
-		
+		queueack.clear();
 		// clear the mutexqueue
-		
+		mutexqueue.clear();
+
 		// increment clock
-		
+		clock.increment();
 		// adjust the clock on the message, by calling the setClock on the message
-				
+		message.setClock(clock.getClock());
 		// wants to access resource - set the appropriate lock variable
-	
+		WANTS_TO_ENTER_CS = true;
 		
 		// start MutualExclusion algorithm
 		
 			// first, call removeDuplicatePeersBeforeVoting. A peer can hold/contain 2 replicas of a file. This peer will appear twice
+		List<Message> activeNodes = removeDuplicatePeersBeforeVoting();
 
 			// multicast the message to activenodes (hint: use multicastMessage)
-		
+		multicastMessage(message, activeNodes);
+
 			// check that all replicas have replied (permission) - areAllMessagesReturned(int numvoters)?
-		
+		boolean permission = areAllMessagesReturned(activeNodes.size());
+		if(permission) {
 			// if yes, acquireLock
-		
-				// send the updates to all replicas by calling node.broadcastUpdatetoPeers
-		
-				// clear the mutexqueue
-		
+			acquireLock();
+
+			// send the updates to all replicas by calling node.broadcastUpdatetoPeers
+			node.broadcastUpdatetoPeers(updates);
+
+			// clear the mutexqueue
+			mutexqueue.clear();
+		}
+
+
 		// return permission
 		
-		return false;
+		return permission;
 	}
 	
 	// multicast message to other processes including self
