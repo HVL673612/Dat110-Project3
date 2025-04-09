@@ -97,11 +97,16 @@ public class MutualExclusion {
 		logger.info("Number of peers to vote = "+activenodes.size());
 		
 		// iterate over the activenodes
-		
-		// obtain a stub for each node from the registry
-		
-		// call onMutexRequestReceived()
-		
+		for(Message m : activenodes) {
+			// obtain a stub for each node from the registry
+			NodeInterface stub = Util.getProcessStub(m.getNodeName(), m.getPort());
+
+			// call onMutexRequestReceived()
+			if(stub != null) {
+				stub.onMutexRequestReceived(message);
+			}
+
+		}
 	}
 	
 	public void onMutexRequestReceived(Message message) throws RemoteException {
